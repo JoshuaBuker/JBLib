@@ -1,4 +1,4 @@
-package org.jblib.Broker;
+package org.jblib.broker;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;

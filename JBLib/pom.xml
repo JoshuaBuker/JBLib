@@ -48,7 +48,7 @@
                                            <archive>
                                            <manifest>
                                                <mainClass>
-                                                   org.example.CameraServer
+                                                   org.jblib.Main
                                                </mainClass>
                                            </manifest>
                                            </archive>

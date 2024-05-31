@@ -33,7 +33,7 @@ public class CameraServer {
         private VideoCapture camera;
 
         public MJPEGHandler() {
-            camera = new VideoCapture(0); // Use the first camera available
+            camera = new VideoCapture(1); // Use the first camera available
         }
 
         @Override
