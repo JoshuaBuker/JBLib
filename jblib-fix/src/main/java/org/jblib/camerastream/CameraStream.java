@@ -27,8 +27,8 @@ public class CameraStream implements Runnable {
     public CameraStream(int port) {
         this.port = port;
         camera = new VideoCapture(0);
-        camera.set(Videoio.CAP_PROP_FRAME_WIDTH, 1280);
-        camera.set(Videoio.CAP_PROP_FRAME_HEIGHT, 720);
+        camera.set(Videoio.CAP_PROP_FRAME_WIDTH, 320);
+        camera.set(Videoio.CAP_PROP_FRAME_HEIGHT, 240);
     }
 
     @Override

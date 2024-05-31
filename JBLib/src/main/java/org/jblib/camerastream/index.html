@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Stream</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<img id="camera-stream" src="stream.jpg" alt="Camera Stream">
+<script>
+        const img = document.getElementById('camera-stream');
+        setInterval(() => {
+            img.src = 'stream.jpg?t=' + new Date().getTime();
+        }, 100); // Refresh every 100ms
+    </script>
+</body>
+</html>
