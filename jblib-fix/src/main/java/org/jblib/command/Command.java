@@ -24,4 +24,9 @@ public class Command {
     public Set<Subsystem> getRequirements() {
         return requirements;
     }
+
+    public void runCommand() {
+        setup();
+        loop();
+    }
 }

@@ -27,7 +27,7 @@ public class VideoStreamViewer {
         frame.setLayout(new BorderLayout());
         frame.add(imageLabel, BorderLayout.CENTER);
         frame.add(fpsLabel, BorderLayout.SOUTH);
-        frame.setSize(1280, 720);
+        frame.setSize(320, 240);
         frame.setVisible(true);
     }
 

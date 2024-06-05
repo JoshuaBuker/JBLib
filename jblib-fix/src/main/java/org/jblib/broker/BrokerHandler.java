@@ -5,6 +5,8 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.util.HashMap;
+
 public class BrokerHandler implements Runnable{
     // ================================= Static =========================================
     private static BrokerHandler instance;
@@ -53,6 +55,7 @@ public class BrokerHandler implements Runnable{
 
     @Override
     public void run() {
+        // Constantly Update Values to an internal data structure. Prob a hashmap.
         try {
             this.subscribe("test/topic");
 
@@ -64,5 +67,7 @@ public class BrokerHandler implements Runnable{
         }
     }
 
-
+    public HashMap<String, String> getMap() {
+        return new HashMap<>();
+    }
 }

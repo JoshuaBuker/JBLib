@@ -1,28 +1,30 @@
 package org.jblib;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.jblib.action.ControlType;
 import org.jblib.broker.BrokerHandler;
-import org.jblib.camerastream.CameraStream;
 import org.jblib.command.Command;
 import org.jblib.scheduler.Scheduler;
 import org.jblib.subsystem.Subsystem;
 
 public class Main {
-    public static void main(String[] args) throws MqttException {
-        Subsystem drivetrain = new Drivetrain();
-        Command drive = new Drive(drivetrain);
+    public static void main(String[] args) throws MqttException, InterruptedException {
+        Scheduler scheduler = Scheduler.getInstance();
+
+        Drivetrain drivetrain = new Drivetrain();
 
         drivetrain.register();
+        drivetrain.setDefaultCommand(new Drive(drivetrain));
 
-        System.out.println(drive.getRequirements().toString());
-        System.out.println(Scheduler.getInstance().getPeriodicSubsystems().toString());
-        System.out.println(Scheduler.getInstance().getRequirementMap().toString());
+//        Thread brokerThread = new Thread(BrokerHandler.getInstance(Constants.Networking.MAIN_ADDRESS));
+//        brokerThread.start();
+//        System.out.printf("tcp://%s:1883%n", Constants.Networking.MAIN_ADDRESS);
 
-        Thread brokerThread = new Thread(BrokerHandler.getInstance("192.168.4.1"));
-        brokerThread.start();
-        System.out.println(String.format("tcp://%s:1883", "192.168.4.1"));
+        while (true) {
+            scheduler.runSchedulerLoop();
+        }
 
-        Thread cameraThread = new Thread(new CameraStream(5000));
-        cameraThread.start();
+
+
     }
 }
