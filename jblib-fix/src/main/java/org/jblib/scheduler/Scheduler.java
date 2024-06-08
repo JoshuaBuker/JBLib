@@ -99,11 +99,12 @@ public class Scheduler {
         }
 
         long timeElapsed = System.currentTimeMillis() - loopStart;
+        long sleepTime = Constants.Scheduler.LOOP_INTERVAL_MILLISECONDS - timeElapsed;
 
         //Check how long the previous section took, and if it was faster than loop interval, delay.
         if(timeElapsed < Constants.Scheduler.LOOP_INTERVAL_MILLISECONDS) {
-            System.out.printf("Loop took %d milliseconds and will sleep for %d\n", timeElapsed, Constants.Scheduler.LOOP_INTERVAL_MILLISECONDS - timeElapsed);
-            TimeUnit.MILLISECONDS.sleep(Constants.Scheduler.LOOP_INTERVAL_MILLISECONDS - timeElapsed);
+            System.out.printf("Loop took %d milliseconds and will sleep for %d\n", timeElapsed, sleepTime);
+            TimeUnit.MILLISECONDS.sleep(sleepTime);
         } else {
             System.out.println("Loop Overrun");
         }
