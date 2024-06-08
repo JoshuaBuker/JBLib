@@ -30,9 +30,7 @@ public class Action {
     public boolean checkCondition() {
         return this.controller.getButtonState(this.buttonID);
     }
-    public void setPreviousValue(boolean val) {
-        this.previousValue = val;
-    }
+    public void setPreviousValue(boolean val) { this.previousValue = val; }
 
 
 }

@@ -20,53 +20,56 @@ public class Scheduler {
     }
 
     // ==================== INSTANCE FIELDS ===========================
-    private final Map<Subsystem, Set<Command>> requirementMap = new LinkedHashMap<>();
+    private final Map<Command, Action> commandActionMap = new LinkedHashMap<>();
     private final Map<Subsystem, Command> defaultCommands = new LinkedHashMap<>();
-    private final Map<Action, Command> actions = new LinkedHashMap<>();
+    private final Map<Action, Command> actionCommandMap = new LinkedHashMap<>();
     private final Set<Subsystem> periodicSubsystems = new HashSet<>();
     private final Map<Subsystem, Set<Command>> activeSubsystems = new LinkedHashMap<>();
-//    private final Set<Command> pendingSetupsWhile = new HashSet<>();
-    private final Set<Command> activeOnCommands = new HashSet<>();
     private final Set<Command> activeDefaultCommands = new HashSet<>();
-//    private final Set<Command> pendingSetupsOn = new HashSet<>();
-    private final Set<Command> activeWhileCommands = new HashSet<>();
-//    private final Set<Command> activeLoopsOn = new HashSet<>();
+    private final Set<Command> activeCommands = new HashSet<>();
 
     public Scheduler() {}
 
-//    public Map<Set<Subsystem>, Command> getRequirementMap() { return this.requirementMap; }
-//    public Map<Subsystem, Command> getDefaultCommands() { return this.defaultCommands; }
-//    public Set<Subsystem> getPeriodicSubsystems() { return this.periodicSubsystems; }
-//    public Set<Command> getCommandsWhile() { return this.pendingSetupsWhile; }
-//    public Set<Subsystem> getActiveSubsystems() { return this.activeSubsystems; }
-//    public Set<Command> getCommandsOn() { return this.activeLoopsWhile; }
-//    public Map<Action, Command> getActions() { return this.actions; }
-//    public Set<Command> getActiveCommands() { return this.activeCommands; }
-
     public void registerDefaultCommand(Subsystem subsystem, Command command) { this.defaultCommands.put(subsystem, command); }
-    public void registerAction(Action action, Command command) { this.actions.put(action, command); }
     public void registerPeriodic(Subsystem subsystem) {
         this.periodicSubsystems.add(subsystem);
     }
+    public void registerCommand(Command command) {}
 
-    public void registerCommand(Command command) {
-        for(Subsystem subsystem : command.getRequirements()) {
-            Set<Command> set = requirementMap.get(subsystem);
-            if(set == null) {
-                set = new HashSet<>(List.of(command));
-                requirementMap.put(subsystem, set);
-            } else {
-                set.add(command);
-            }
-        }
+    public void registerAction(Action action, Command command) {
+        this.actionCommandMap.put(action, command);
+        this.commandActionMap.put(command, action);
     }
 
     public void runSchedulerLoop() throws InterruptedException {
         long loopStart = System.currentTimeMillis();
 
         // Loop through actions and add their commands activeCommands
-        for(Map.Entry<Action, Command> actionEntry : actions.entrySet()) {
+        for(Map.Entry<Action, Command> actionEntry : actionCommandMap.entrySet()) {
+            boolean actionState = actionEntry.getKey().checkCondition();
+            if(actionState) {
+                if((actionEntry.getKey().getControlType() == ControlType.ON_TRUE && !actionEntry.getKey().getPreviousValue()) || actionEntry.getKey().getControlType() == ControlType.WHILE_TRUE) {
+                    for(Subsystem sub : actionEntry.getValue().getRequirements()) {
+                        if(activeSubsystems.containsKey(sub)) {
+                            Set<Command> commands = activeSubsystems.get(sub);
+                            for(Command command : commands) {
+                                if (command != actionEntry.getValue()) {
+                                    command.end();
+                                    commands.remove(command);
+                                    activeCommands.remove(command);
+                                }
+                            }
+                        }
+                    }
+                    activeCommands.add(actionEntry.getValue());
+                    actionEntry.getValue().setup();
+                }
+            }
+        }
 
+        // Run the loop method of commands
+        for (Command command : activeCommands) {
+            command.loop();
         }
 
         // Loop through default commands
@@ -85,6 +88,14 @@ public class Scheduler {
         // Loop through default commands
         for (Subsystem subsystem : periodicSubsystems) {
             subsystem.periodic();
+        }
+
+        // Remove On True Action commands from active Commands list
+        for(Command command : activeCommands) {
+            if(commandActionMap.get(command).getControlType() == ControlType.ON_TRUE) {
+                command.end();
+                activeCommands.remove(command);
+            }
         }
 
         long timeElapsed = System.currentTimeMillis() - loopStart;
